@@ -1,0 +1,397 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17110d">
+<title>梦幻洗宠模拟 · 召唤兽栏 / 洗炼 / 打书 / 炼妖</title>
+<meta name="description" content="梦幻西游风格的召唤兽模拟器：召唤兽栏、金柳露洗炼、兽决打书、双宠炼妖，只记录次数与用量。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23a8322a'/%3E%3Ctext x='32' y='45' font-size='38' text-anchor='middle' fill='%23f6e7c8' font-family='serif'%3E洗%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="page-grain" aria-hidden="true"></div>
+<div class="app">
+
+  <header class="masthead">
+    <div class="brand">
+      <div class="brand-seal">洗</div>
+      <div class="brand-text">
+        <h1>梦幻洗宠模拟</h1>
+        <p>兽栏 · 洗炼 · 打书 · 炼妖</p>
+      </div>
+    </div>
+    <nav class="main-tabs" role="tablist" aria-label="功能切换">
+      <button class="tab is-active" role="tab" aria-selected="true" data-tab="stable">兽栏</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="wash">洗炼</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="book">打书</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="fusion">炼妖</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="album">图鉴</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="record">记录</button>
+    </nav>
+    <div class="mast-tools">
+      <div class="counter-ticker" title="兽栏中的召唤兽数量">
+        <span>兽栏</span><b id="stableCount">0</b><i>只</i>
+      </div>
+      <button class="icon-btn" id="soundBtn" aria-pressed="true" title="音效开关">音</button>
+      <button class="icon-btn" id="helpBtn" title="玩法说明">?</button>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- ======================= 召唤兽栏 ======================= -->
+    <section class="tab-panel is-active" id="panel-stable" role="tabpanel" aria-label="召唤兽栏">
+      <section class="panel stable-hero">
+        <div class="stable-hero-left">
+          <div class="stable-seal">栏</div>
+          <div>
+            <h2>召唤兽栏</h2>
+            <p>共 <b id="stableTotal">0</b> 只 · 点击召唤兽可洗炼、打书、炼妖或删除</p>
+          </div>
+        </div>
+        <div class="stable-hero-actions">
+          <button class="ghost-btn" data-goto="album">打开万灵谱</button>
+          <button class="seal-button" id="addPetBtn">
+            <span class="seal-main">增加召唤兽</span>
+            <small>从万灵谱中挑选一只</small>
+          </button>
+        </div>
+      </section>
+      <div class="stable-grid" id="stableGrid"></div>
+      <p class="stable-note">点击召唤兽卡牌即可洗炼、打书、炼妖或删除。洗炼、打书与炼妖只记录次数和用量。</p>
+    </section>
+
+    <!-- ======================= 洗炼 ======================= -->
+    <section class="tab-panel" id="panel-wash" role="tabpanel" aria-label="洗炼" hidden>
+      <div class="require-pet panel" id="washRequire" hidden>
+        <div class="require-seal">选</div>
+        <b>先从召唤兽栏选择召唤兽</b>
+        <p>洗炼需要一只兽栏中的召唤兽作为胚子。选择后会自动进入洗炼台。</p>
+        <button class="seal-button" data-goto="stable"><span class="seal-main">前往召唤兽栏</span></button>
+      </div>
+
+      <div class="wash-grid" id="washGrid">
+        <aside class="rail">
+          <section class="panel current-card">
+            <div class="panel-head">
+              <h3>已选召唤兽</h3>
+              <button class="link-btn" id="washChangeBtn">更换</button>
+            </div>
+            <div class="current-pet">
+              <div class="portrait-ring portrait-sm" id="washPortrait"></div>
+              <div class="current-info">
+                <div class="pet-name-line"><b id="washName">—</b><span class="tag variant-tag" id="washVariantTag" hidden>变异</span></div>
+                <div class="pet-sub" id="washMeta">—</div>
+                <div class="tag-line">
+                  <span class="grade-badge" id="washGrade">—</span>
+                  <span class="element-tag" id="washElement">—</span>
+                </div>
+              </div>
+            </div>
+            <div class="mini-stats">
+              <div><span>评分</span><b id="washScore">0</b></div>
+              <div><span>成长</span><b id="washGrowth">0</b></div>
+              <div><span>技能</span><b id="washSkills">0</b></div>
+            </div>
+            <button class="ghost-btn wide" id="washGoStable">回到召唤兽栏</button>
+          </section>
+
+          <section class="panel item-card">
+            <div class="panel-head"><h3>洗炼道具</h3><span class="hint" id="washItemUsed">累计 0 次</span></div>
+            <div class="item-line">
+              <div class="item-icon" id="washItemIcon"></div>
+              <div class="item-meta">
+                <b id="washItemName">金柳露</b>
+                <span id="washItemCount">本次消耗 ×1</span>
+              </div>
+            </div>
+            <p class="item-rule" id="washItemRule">普通召唤兽 · 参战等级 &lt; 95</p>
+            <label class="switch-line" id="washVariantLine">
+              <span>变异洗炼 <small>换用净瓶玉露，洗出变异造型</small></span>
+              <input type="checkbox" id="washVariantToggle">
+              <i class="switch" aria-hidden="true"></i>
+            </label>
+          </section>
+
+          <section class="panel wash-settings">
+            <div class="panel-head"><h3>洗炼设置</h3></div>
+            <div class="field">
+              <span class="field-label">连续洗炼</span>
+              <div class="seg" id="timesSeg" role="group" aria-label="连续洗炼次数">
+                <button type="button" data-v="1" class="is-active">1 次</button>
+                <button type="button" data-v="5">5 次</button>
+                <button type="button" data-v="10">10 次</button>
+                <button type="button" data-v="50">50 次</button>
+              </div>
+            </div>
+            <div class="field">
+              <span class="field-label">目标技能数 <em class="target-max" id="targetMax"></em></span>
+              <div class="stepper">
+                <button type="button" id="targetDown" aria-label="减少目标技能数">−</button>
+                <b id="targetVal">5</b>
+                <button type="button" id="targetUp" aria-label="增加目标技能数">+</button>
+              </div>
+            </div>
+            <label class="switch-line">
+              <span>自动保留更高评分 <small>批量洗炼时直接替换更好的结果</small></span>
+              <input type="checkbox" id="autoKeep" checked>
+              <i class="switch" aria-hidden="true"></i>
+            </label>
+            <div class="use-preview">
+              本次 <b id="washPreviewTimes">1</b> 次 · <span id="washPreviewItem">金柳露 ×1</span>
+              <small id="washPreviewUsed">累计使用 0 次</small>
+            </div>
+          </section>
+        </aside>
+
+        <section class="stage">
+          <div class="stage-frame" id="stageFrame">
+            <div class="stage-head">
+              <span class="stage-title">洗 炼 台</span>
+              <span class="stage-best">本宠最佳 <b id="bestScore">—</b></span>
+            </div>
+            <div class="stage-body">
+              <div class="stage-cloud c1" aria-hidden="true"></div>
+              <div class="stage-cloud c2" aria-hidden="true"></div>
+              <span class="stage-verse left" aria-hidden="true">洗尽铅华</span>
+              <span class="stage-verse right" aria-hidden="true">万灵归心</span>
+              <div class="halo" aria-hidden="true"></div>
+              <div class="portrait-stage" id="stagePortrait"></div>
+              <div class="water-fx" id="waterFx" aria-hidden="true"></div>
+              <div class="wash-stamp" id="washStamp" aria-hidden="true">洗炼中</div>
+              <div class="stage-plate">
+                <b id="stageName">—</b>
+                <span id="stageLine">—</span>
+              </div>
+            </div>
+            <div class="stage-foot">
+              <button class="seal-button" id="washBtn">
+                <span class="seal-main">洗 炼</span>
+                <small id="washBtnCount">1 次</small>
+              </button>
+              <button class="ghost-btn" id="stageChangeBtn">更换召唤兽</button>
+            </div>
+          </div>
+          <p class="stage-tip" id="stageTip">重掷六项资质、成长与技能格；结果若不满意，可直接放生。</p>
+        </section>
+
+        <aside class="result-col">
+          <section class="panel result-panel" id="resultPanel"></section>
+          <section class="panel history-panel">
+            <div class="panel-head">
+              <h3>洗炼记录</h3>
+              <span class="hint" id="washCount">0 次</span>
+            </div>
+            <ol class="mini-history" id="washHistory"></ol>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ======================= 打书 ======================= -->
+    <section class="tab-panel" id="panel-book" role="tabpanel" aria-label="打书" hidden>
+      <div class="require-pet panel" id="bookRequire" hidden>
+        <div class="require-seal">选</div>
+        <b>先从召唤兽栏选择召唤兽</b>
+        <p>打书会修改兽栏中召唤兽的技能，请先在兽栏中选择一只。</p>
+        <button class="seal-button" data-goto="stable"><span class="seal-main">前往召唤兽栏</span></button>
+      </div>
+
+      <div class="book-grid" id="bookGrid">
+        <aside class="rail">
+          <section class="panel current-card compact">
+            <div class="panel-head"><h3>已选召唤兽</h3><span class="hint" id="bookSlotHint">0 / 12 技能</span></div>
+            <div class="current-pet">
+              <div class="portrait-ring portrait-sm" id="bookPortrait"></div>
+              <div class="current-info">
+                <div class="pet-name-line"><b id="bookName">—</b></div>
+                <div class="pet-sub" id="bookMeta">—</div>
+                <div class="tag-line"><span class="grade-badge" id="bookGrade">—</span></div>
+              </div>
+            </div>
+            <button class="ghost-btn wide" id="bookChangeBtn">更换召唤兽</button>
+          </section>
+          <section class="panel book-picker">
+            <div class="panel-head"><h3>兽决</h3><span class="hint" id="bookCount">207 本</span></div>
+            <div class="search-wrap">
+              <input class="search-input" id="bookSearch" type="search" placeholder="搜索技能：高级必杀 / 须弥真言…" autocomplete="off">
+            </div>
+            <div class="book-list" id="bookList" role="listbox" aria-label="兽决列表"></div>
+          </section>
+        </aside>
+
+        <section class="stage book-stage">
+          <div class="stage-frame">
+            <div class="stage-head">
+              <span class="stage-title">打 书</span>
+              <span class="stage-best">顶书开格 · 开格概率 25%</span>
+            </div>
+            <div class="stage-body">
+              <div class="halo" aria-hidden="true"></div>
+              <div class="portrait-stage portrait-book" id="bookStagePortrait"></div>
+              <div class="book-slots" id="bookSlots" aria-label="技能栏"></div>
+            </div>
+            <div class="stage-foot">
+              <button class="seal-button" id="bookApplyBtn">
+                <span class="seal-main">打 书</span>
+                <small id="bookApplyCount">—</small>
+              </button>
+              <button class="ghost-btn" id="bookClearBtn">清空选择</button>
+            </div>
+          </div>
+          <div class="book-log" id="bookLog"></div>
+        </section>
+
+        <aside class="result-col">
+          <section class="panel selected-book" id="selectedBookPanel"></section>
+          <section class="panel">
+            <div class="panel-head"><h3>兽决用量</h3><span class="hint">按使用次数</span></div>
+            <div class="usage-list compact" id="bookUsageTop"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h3>最近打书</h3></div>
+            <ol class="mini-history" id="bookHistory"></ol>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ======================= 炼妖 ======================= -->
+    <section class="tab-panel" id="panel-fusion" role="tabpanel" aria-label="炼妖" hidden>
+      <div class="require-pet panel" id="fusionRequire" hidden>
+        <div class="require-seal">炼</div>
+        <b>至少需要两只兽栏召唤兽</b>
+        <p>炼妖的主宠与副宠都必须从召唤兽栏中选择。先增加几只召唤兽吧。</p>
+        <button class="seal-button" data-goto="stable"><span class="seal-main">前往召唤兽栏</span></button>
+      </div>
+
+      <div class="fusion-grid" id="fusionGrid">
+        <section class="stage fusion-stage">
+          <div class="stage-frame">
+            <div class="stage-head">
+              <span class="stage-title">炼 妖</span>
+              <span class="stage-best">技能继承 30% · 成长浮动</span>
+            </div>
+            <div class="fusion-slots">
+              <div class="fusion-slot" id="fusionMain"></div>
+              <div class="fusion-rune" aria-hidden="true">炼</div>
+              <div class="fusion-slot" id="fusionSub"></div>
+            </div>
+            <div class="stage-foot">
+              <button class="seal-button" id="fuseBtn">
+                <span class="seal-main">开始炼妖</span>
+                <small>消耗主宠与副宠</small>
+              </button>
+              <button class="ghost-btn" id="fusionResetBtn">重选</button>
+            </div>
+          </div>
+          <div class="fusion-result" id="fusionResult"></div>
+        </section>
+
+        <aside class="rail wide-rail">
+          <section class="panel">
+            <div class="panel-head"><h3>兽栏</h3><span class="hint" id="fusionStableCount">0 只</span></div>
+            <p class="fusion-hint">主宠与副宠都从召唤兽栏中选择。炼妖后两只召唤兽都会被消耗，结果自动收入兽栏。</p>
+            <div class="fusion-roster" id="fusionRoster"></div>
+            <div class="box-actions">
+              <button class="ghost-btn" id="fusionAddBtn">增加召唤兽</button>
+              <button class="ghost-btn" data-goto="stable">查看兽栏</button>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h3>炼妖规则</h3></div>
+            <ul class="rule-list">
+              <li>90% 成功：主宠 / 副宠各 45% 概率成为结果造型。</li>
+              <li>技能从双亲技能池中各以 30% 概率继承，必带技能保留，最多 12 格。</li>
+              <li>成长取双亲均值 ×（0.96 / 0.98 / 1.00 / 1.02）。</li>
+              <li>资质取双亲均值 × 0.70 ~ 1.10，最低 800。</li>
+              <li>10% 失败：变为大海龟、泡泡或野生召唤兽。</li>
+              <li>炼妖结果自动收入召唤兽栏，可继续进行洗炼或打书。</li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ======================= 图鉴 ======================= -->
+    <section class="tab-panel" id="panel-album" role="tabpanel" aria-label="图鉴" hidden>
+      <section class="panel album-panel">
+        <div class="album-head">
+          <div>
+            <h2>万灵谱</h2>
+            <p>共 <b id="albumTotal">203</b> 种召唤兽 · 已收集 <b id="albumSeen">0</b> 种</p>
+          </div>
+          <div class="album-tools">
+            <input class="search-input" id="albumSearch" type="search" placeholder="搜索名字 / 技能 / 场景" autocomplete="off">
+            <select class="select" id="albumRole" aria-label="按定位筛选">
+              <option value="">全部定位</option>
+              <option value="attack">物理</option>
+              <option value="magic">法术</option>
+              <option value="blood">气血</option>
+              <option value="speed">速度</option>
+              <option value="balanced">均衡</option>
+            </select>
+          </div>
+        </div>
+        <div class="level-chips" id="levelChips"></div>
+        <div class="album-grid" id="albumGrid"></div>
+        <div class="album-foot">
+          <button class="ghost-btn" id="albumMoreBtn">加载更多</button>
+        </div>
+      </section>
+    </section>
+
+    <!-- ======================= 记录 ======================= -->
+    <section class="tab-panel" id="panel-record" role="tabpanel" aria-label="记录" hidden>
+      <div class="record-grid">
+        <section class="panel record-summary" id="recordSummary"></section>
+        <section class="panel">
+          <div class="panel-head"><h3>洗炼道具用量</h3><span class="hint">只记次数</span></div>
+          <div class="usage-list" id="itemUsage"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h3>兽决用量</h3><span class="hint" id="bookUsageCount">0 种</span></div>
+          <div class="usage-list" id="bookUsage"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h3>成就</h3><span class="hint" id="achCount">0 / 12</span></div>
+          <div class="ach-grid" id="achGrid"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h3>名人堂</h3><span class="hint">按评分</span></div>
+          <div class="hall-list" id="hallList"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h3>操作记录</h3><span class="hint" id="logCount">0 条</span></div>
+          <div class="ledger-list" id="logList"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h3>设置</h3></div>
+          <div class="settings-list">
+            <button class="ghost-btn" id="exportBtn">导出存档</button>
+            <button class="ghost-btn danger" id="resetBtn">清空存档</button>
+          </div>
+          <p class="fine-print">数据保存在当前浏览器 localStorage 中。本工具为同人模拟，与官方无关；所有记录只统计次数与用量。</p>
+        </section>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <span>梦幻洗宠模拟 · 同人练习作品</span>
+    <span>召唤兽资料整理自官方宠物站 · 立绘由 SVG 程序生成</span>
+  </footer>
+</div>
+
+<div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
+<div class="modal-root" id="modalRoot" hidden></div>
+
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/portraits.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
